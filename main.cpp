@@ -5,6 +5,78 @@
 #include <iostream>
 #include "ignore.h"
 #include <string_view>
+#include "Random.h"
+
+enum class MonsterType
+{
+    Goblin,
+    Ogre,
+    Wyverns,
+    Slime,
+    Witch,
+    Giant_Spider,
+    Skeleton,
+    Ghoul,
+};
+
+struct Monster
+{
+    MonsterType monsterType{};
+    int monsterHealthPoints{};
+    int monsterDamage{};
+
+    MonsterType generateRandomMonster()
+    {
+        // generate a random number for a random monster
+        return static_cast<MonsterType>(Random::get(0,7));
+    }
+
+    // access the enumerator from monster type enum and set it's stat accordingly
+    void setMonsterStats(MonsterType& monsterType)
+    {
+        using enum MonsterType;
+        switch (monsterType){
+            case Goblin:
+                monsterHealthPoints = 80;
+                monsterDamage = 30;
+                break;
+            case Ogre:
+                monsterHealthPoints = 120;
+                monsterDamage = 40;
+                break;
+            case Wyverns:
+                monsterHealthPoints = 150;
+                monsterDamage = 20;
+                break;
+            case Slime:
+                monsterHealthPoints = 30;
+                monsterDamage = 10;
+                break;
+            case Witch:
+                monsterHealthPoints = 70;
+                monsterDamage = 60;
+                break;
+            case Giant_Spider:
+                monsterHealthPoints = 150;
+                monsterDamage = 30;
+                break;
+            case Skeleton:
+                monsterHealthPoints = 60;
+                monsterDamage = 50;
+                break;
+            case Ghoul:
+                monsterHealthPoints = 100;
+                monsterDamage = 20;
+                break;
+            
+            
+        }
+    }
+
+
+};
+
+
 
 enum class CharacterClasses
 {
