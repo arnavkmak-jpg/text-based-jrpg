@@ -6,3 +6,6 @@
 
 ### Second Commit
 * Random generation of monsters added
+
+### Third Commit
+* Separate header files for monster and player enums
