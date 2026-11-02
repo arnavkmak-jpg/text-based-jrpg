@@ -6,22 +6,13 @@
 #include "ignore.h"
 #include <string_view>
 #include "Random.h"
-
-enum class MonsterType
-{
-    Goblin,
-    Ogre,
-    Wyverns,
-    Slime,
-    Witch,
-    Giant_Spider,
-    Skeleton,
-    Ghoul,
-};
+#include "monstertype.h"
+#include "characterclass.h"
 
 struct Monster
 {
     MonsterType monsterType{};
+    int monsterRemainingHealthPoints{};
     int monsterHealthPoints{};
     int monsterDamage{};
 
@@ -76,18 +67,11 @@ struct Monster
 
 };
 
-
-
-enum class CharacterClasses
-{
-    Warrior = 1,
-    Mage = 2,
-};
-
 struct Player
 {
     std::string_view playerName{};
     CharacterClasses charClass{};
+    int playerRemainingHealthPoints{};
     int playerHealthPoints{};
     int playerDamage{};
 
@@ -139,6 +123,19 @@ CharacterClasses chooseCharacterClass()
     return static_cast<CharacterClasses>(input);
 }
 
+void startRound(Player& player, Monster& monster)
+{
+    // need the player (name, class, remHP, HP, dmg)
+    // generate random monster 
+    // user chooses to (1. attack, 2. heal)
+    // warrior gets 1 heal per monster defeated (heals 100 hp)
+    // mage has unlimited heals (heals full health)
+    // player moves 1st 
+    int roundNumber{1};
+    std::cout << "Round no. " << roundNumber << " starts";
+    std::cout << "You have encountered a " << monster.monsterType;
+
+}
 
 
 int main()
