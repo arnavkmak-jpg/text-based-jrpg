@@ -13,6 +13,8 @@ enum class MonsterType
     Giant_Spider,
     Skeleton,
     Ghoul,
+    // bosses
+    Dragon_King,
 };
 
 std::string_view getMonsterType(MonsterType& monsterType);

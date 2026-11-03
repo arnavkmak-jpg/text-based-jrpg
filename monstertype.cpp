@@ -13,6 +13,7 @@ std::string_view getMonsterType(MonsterType& monsterType)
         case Giant_Spider: return "Giant Spider";
         case Skeleton:     return "Skeletons";
         case Ghoul:        return "Ghoul";
+        case Dragon_King:  return "Dragon King";
     }
 }
 
