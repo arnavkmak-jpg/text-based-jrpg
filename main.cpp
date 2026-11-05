@@ -139,10 +139,18 @@ CharacterClasses chooseCharacterClass()
 
 std::string getPlayerName()
 {
-    std::cout << "Please input your name (5-10 characters): ";
-    // TO DO: limit input to 5 - 10 characters
     std::string playerName{};
-    std::cin >> playerName;
+
+    while (playerName.length() < 3 || playerName.length() > 10){
+        std::cout << "Please input your name (3-10 characters): ";
+        std::cin >> playerName;
+        if (playerName.length() < 3 || playerName.length() > 10){
+            std::cout << "name characters out of given range, please input again!\n";
+            continue;
+        }
+        
+    }
+    
 
     return playerName;
 }
@@ -181,19 +189,31 @@ bool startRound(Player& player, int roundNumber, int healingItems)
         // display player and enemy stats
         std::cout << player.charClass << "'s HP(" << player.playerRemainingHealthPoints << "/" << player.playerHealthPoints << ")                 " 
         << monster.monsterType << "'s HP(" << monster.monsterRemainingHealthPoints << "/" << monster.monsterHealthPoints << ")\n";
-        std::cout << "PLAYER TURN!\n";
-        std::cout << "What will " << player.playerName << " do?\n";
-        std::cout << "1. Attack           2. Heal\n";
-        int playerAction{};
-        std::cin >> playerAction;
-
-        // TODO: handle bad input
+        int playerAction{0};
+        
+        while (playerAction < 1 || playerAction > 2){
+            std::cout << "PLAYER TURN!\n";
+            std::cout << "What will " << player.playerName << " do?(1/2)\n";
+            std::cout << "1. Attack           2. Heal\n";
+        
+            std::cin >> playerAction;
+            if (extractionFailed()){
+                std::cout << "Bad input please input again!\n";
+                playerAction = 0;
+                continue;
+            }
+            ignoreLine();
+        }
+        
 
         switch (playerAction){
             case 1: // player attacks
                 std::cout << player.playerName << " deals " << player.playerDamage << " damage\n" ;
                 monster.monsterRemainingHealthPoints -= player.playerDamage; // player deals damage equivalent to damage
-                // TODO: display HPs of both parties
+
+                std::cout << player.charClass << "'s HP(" << player.playerRemainingHealthPoints << "/" << player.playerHealthPoints << ")                 " 
+               << monster.monsterType << "'s HP(" << monster.monsterRemainingHealthPoints << "/" << monster.monsterHealthPoints << ")\n";
+                
                 break;
             case 2: // player heals
                 switch (player.charClass){
@@ -203,9 +223,20 @@ bool startRound(Player& player, int roundNumber, int healingItems)
                             continue;
                         }
 
-                        std::cout << player.playerName << "uses a healing item\n";
-                        std::cout << "restored 100 HP!";
-                        player.playerRemainingHealthPoints += 100; // in case of warrior you get 1 heal per monster defeated each heal heals 100 hp
+                        if (player.playerRemainingHealthPoints == player.playerHealthPoints){
+                            std::cout << "failed to use heal, hp is already full!\n";
+                            continue;
+                        }
+
+                        std::cout << player.playerName << " uses a healing item\n";
+                        std::cout << "restored 100 HP!\n";
+                        if (player.playerHealthPoints - player.playerRemainingHealthPoints < 100){
+                            player.playerRemainingHealthPoints = player.playerHealthPoints;
+                        }
+                        else {
+                            player.playerRemainingHealthPoints += 100; // in case of warrior you get 1 heal per monster defeated each heal heals 100 hp
+                        }
+                        --healingItems;
                         std::cout << player.charClass << "'s HP(" << player.playerRemainingHealthPoints << "/" << player.playerHealthPoints << ")"; // display player hp
                         break;
                     case Mage:
@@ -244,8 +275,13 @@ bool playAgain()
     while (playerInputPlayAgain != 'y' && playerInputPlayAgain != 'n'){
         std::cout << "Would you like to play again?(y/n): ";
         std::cin >> playerInputPlayAgain;
+        if (extractionFailed()){
+            std::cout << "bad input please try again!\n";
+            continue;
+        }
+        ignoreLine();
     }
-    
+
     if (playerInputPlayAgain == 'y') return true;
     return false;
 }
@@ -293,7 +329,7 @@ void startGame()
      
     if (roundNumber > 5)
     {
-        std::cout << "";
+        std::cout << "Congratulations! you successfully slayed the final boss and beat the final stage!\n";
     }
 
     
@@ -303,6 +339,8 @@ void startGame()
 
 int main()
 {
+    do {
     startGame();
+    } while (playAgain());
     return 0;
 }
