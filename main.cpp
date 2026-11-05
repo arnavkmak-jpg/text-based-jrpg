@@ -33,6 +33,7 @@ struct Monster
     void setMonsterStats(MonsterType& monsterType)
     {
         using enum MonsterType;
+        Boss boss{};
         switch (monsterType){
             case Goblin:
                 monsterHealthPoints = 80;
@@ -66,8 +67,10 @@ struct Monster
                 monsterHealthPoints = 100;
                 monsterDamage = 20;
                 break;
-            
-            
+            case Dragon_King:
+                monsterHealthPoints = boss.bossHealthPoints;
+                monsterDamage = boss.bossDamage;
+                break;
         }
         monsterRemainingHealthPoints = monsterHealthPoints;
     }
@@ -89,7 +92,7 @@ struct Player
         using enum CharacterClasses;
         switch (charClass){
             case Warrior: 
-                playerHealthPoints = 150;
+                playerHealthPoints = 200;
                 playerDamage = 60;
                 break;
             case Mage:
@@ -114,6 +117,8 @@ CharacterClasses chooseCharacterClass()
 
     // loop runs till the input is out of range
     while (input < 1 || input > 2){
+        std::cout << "1. Warrior\n";
+        std::cout << "2. Mage\n";
         std::cout << "Choose a class (1 or 2): ";
         std::cin >> input;
 
@@ -132,9 +137,9 @@ CharacterClasses chooseCharacterClass()
     return static_cast<CharacterClasses>(input);
 }
 
-std::string_view getPlayerName()
+std::string getPlayerName()
 {
-    std::cout << "Please input your name (5-10 characteres): ";
+    std::cout << "Please input your name (5-10 characters): ";
     // TO DO: limit input to 5 - 10 characters
     std::string playerName{};
     std::cin >> playerName;
@@ -144,7 +149,7 @@ std::string_view getPlayerName()
 
 
 
-bool startRound(Player& player, Boss& boss, int roundNumber, int healingItems)
+bool startRound(Player& player, int roundNumber, int healingItems)
 {
     Monster monster{};
     // check if it's a boss round or normal round
@@ -156,26 +161,26 @@ bool startRound(Player& player, Boss& boss, int roundNumber, int healingItems)
         monster.monsterType = randomMonster;
         monster.setMonsterStats(randomMonster);
     }
-    else {
-        monster.monsterType = MonsterType::Dragon_King;
-        monster.monsterDamage = boss.bossDamage;
-        monster.monsterHealthPoints = boss.bossHealthPoints;
-        monster.monsterRemainingHealthPoints = boss.bossHealthPoints;
+    else { // boss fight case
+        MonsterType bossType{MonsterType::Dragon_King};
+        monster.monsterType = bossType;
+        monster.setMonsterStats(bossType);
+        std::cout << "Congratulations! You made it to the final boss!\n";
     }
     
 
     using enum CharacterClasses;
     // int roundNumber{1}; // counts the current round number
     // int healingItems{0}; // count of healing items used by warrior class
-    std::cout << "Round no. " << roundNumber << " starts";
+    std::cout << "Round no. " << roundNumber << " starts\n";
     
     
-    std::cout << "You have encountered a " << monster.monsterType;
+    std::cout << "You have encountered a " << monster.monsterType << "\n";
 
     while (player.playerRemainingHealthPoints > 0 && monster.monsterRemainingHealthPoints > 0){
         // display player and enemy stats
         std::cout << player.charClass << "'s HP(" << player.playerRemainingHealthPoints << "/" << player.playerHealthPoints << ")                 " 
-        << monster.monsterType << "'s HP(" << monster.monsterRemainingHealthPoints << "/" << monster.monsterHealthPoints << "\n";
+        << monster.monsterType << "'s HP(" << monster.monsterRemainingHealthPoints << "/" << monster.monsterHealthPoints << ")\n";
         std::cout << "PLAYER TURN!\n";
         std::cout << "What will " << player.playerName << " do?\n";
         std::cout << "1. Attack           2. Heal\n";
@@ -188,6 +193,7 @@ bool startRound(Player& player, Boss& boss, int roundNumber, int healingItems)
             case 1: // player attacks
                 std::cout << player.playerName << " deals " << player.playerDamage << " damage\n" ;
                 monster.monsterRemainingHealthPoints -= player.playerDamage; // player deals damage equivalent to damage
+                // TODO: display HPs of both parties
                 break;
             case 2: // player heals
                 switch (player.charClass){
@@ -201,25 +207,24 @@ bool startRound(Player& player, Boss& boss, int roundNumber, int healingItems)
                         std::cout << "restored 100 HP!";
                         player.playerRemainingHealthPoints += 100; // in case of warrior you get 1 heal per monster defeated each heal heals 100 hp
                         std::cout << player.charClass << "'s HP(" << player.playerRemainingHealthPoints << "/" << player.playerHealthPoints << ")"; // display player hp
-
+                        break;
                     case Mage:
                         std::cout << player.playerName << "casts a healing spell\n";
                         std::cout << "HP fully restored!";
                         player.playerRemainingHealthPoints = player.playerHealthPoints; // in case of mage he casts a heal spell which restores to full hp
                         std::cout << player.charClass << "'s HP(" << player.playerRemainingHealthPoints << "/" << player.playerHealthPoints << ")";
+                        break;
                 }
         }
         if (monster.monsterRemainingHealthPoints <= 0) {
-            std::cout << player.playerName << " successfully slayed " << monster.monsterType << "!";
-            if (player.charClass == Warrior){ // warrior gets a healing item for each monster slayed
-                ++healingItems;
+            std::cout << player.playerName << " successfully slayed " << monster.monsterType << "!\n";
+            if (player.charClass == Warrior){
+                std::cout << "1 healing item gained!\n";
             }
-            // return true player won
-            ++roundNumber;
             return true;
         }
         std::cout << "ENEMY TURN!\n";
-        std::cout << "The " << monster.monsterType << " deals " << monster.monsterDamage << " damage ";
+        std::cout << "The " << monster.monsterType << " deals " << monster.monsterDamage << " damage\n";
         player.playerRemainingHealthPoints -= monster.monsterDamage;
         // if (player.playerRemainingHealthPoints == 0){
         //     std::cout << "GAME OVER!\n";
@@ -232,14 +237,26 @@ bool startRound(Player& player, Boss& boss, int roundNumber, int healingItems)
 
 }
 
+bool playAgain()
+{
+    char playerInputPlayAgain{};
+    
+    while (playerInputPlayAgain != 'y' && playerInputPlayAgain != 'n'){
+        std::cout << "Would you like to play again?(y/n): ";
+        std::cin >> playerInputPlayAgain;
+    }
+    
+    if (playerInputPlayAgain == 'y') return true;
+    return false;
+}
+
 void startGame()
 {
     char startTheGame{'n'};
-    Boss boss{};
     Player player{};
     // input a name
     while (startTheGame != 'y'){
-        std::string_view playerName{getPlayerName()};
+        std::string playerName{getPlayerName()};
 
         // choose a class
         CharacterClasses charClass{chooseCharacterClass()};
@@ -251,8 +268,8 @@ void startGame()
 
         // display the player stats
         std::cout << "You have chosen the class: " << player.charClass << "\n";
-        std::cout << "HP(" << player.playerRemainingHealthPoints << "/" << player.playerHealthPoints << ")";
-        std::cout << "Attack: " << player.playerDamage;
+        std::cout << "HP(" << player.playerRemainingHealthPoints << "/" << player.playerHealthPoints << ")\n";
+        std::cout << "Attack: " << player.playerDamage << "\n";
 
         std::cout << "Would you like to start the game? (y/n): ";
         std::cin >> startTheGame;
@@ -266,20 +283,26 @@ void startGame()
     // we move proceed to next round as startRound is true (player beat the monster) 
     // or round number is less 5
     do {
-        startRound(player, boss, roundNumber, healingItems);
-    } while (startRound || roundNumber < 5);
+        startRound(player, roundNumber, healingItems);
+        ++roundNumber;
+        if (player.charClass == CharacterClasses::Warrior){
+            ++healingItems;
+        }
+    } while (startRound(player, roundNumber, healingItems) && roundNumber < 5);
     
      
+    if (roundNumber > 5)
+    {
+        std::cout << "";
+    }
 
+    
     
 }
 
 
 int main()
 {
-    CharacterClasses charClass{chooseCharacterClass()};
-    Player player{.playerName = "FBI", .charClass = charClass};
-    player.setPlayerStats(charClass);
-    printPlayerStats(player);
+    startGame();
     return 0;
 }

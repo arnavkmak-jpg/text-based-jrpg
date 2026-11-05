@@ -11,9 +11,11 @@ std::string_view getMonsterType(MonsterType& monsterType)
         case Wyverns:      return "Wyverns";
         case Slime:        return "Slime";
         case Giant_Spider: return "Giant Spider";
+        case Witch:        return "Witch";
         case Skeleton:     return "Skeletons";
         case Ghoul:        return "Ghoul";
         case Dragon_King:  return "Dragon King";
+        default: return "???";
     }
 }
 

@@ -8,6 +8,7 @@ std::string_view getCharacterClass(CharacterClasses& charClass)
     switch (charClass){
         case Warrior: return "Warrior";
         case Mage: return "Mage";
+        default: return "???";
     }
 }
 
